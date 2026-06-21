@@ -310,7 +310,7 @@ cd docker
 docker-compose up -d
 
 # Verify
-curl http://localhost:5000/health
+curl http://localhost:5001/health
 ```
 
 ### 2. Start Implementing Business Logic
@@ -491,10 +491,10 @@ ls -la logs/
 ### Test Services
 ```bash
 # Health check
-curl http://localhost:5000/health
+curl http://localhost:5001/health
 
 # API info
-curl http://localhost:5000/api/v1
+curl http://localhost:5001/api/v1
 
 # MongoDB (Docker)
 docker exec -it digital-signature-mongo mongosh
@@ -590,7 +590,7 @@ chown -R $USER:$USER storage logs
 - [ ] Redis connected successfully
 - [ ] No errors in server logs
 - [ ] Docker containers running (if using Docker)
-- [ ] Can access http://localhost:5000/health
+- [ ] Can access http://localhost:5001/health
 - [ ] All documentation reviewed
 
 ---

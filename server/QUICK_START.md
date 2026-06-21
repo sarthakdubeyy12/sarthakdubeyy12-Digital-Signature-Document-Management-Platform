@@ -30,10 +30,10 @@ docker-compose ps
 docker-compose logs -f api
 
 # 7. Test the API
-curl http://localhost:5000/health
+curl http://localhost:5001/health
 ```
 
-**Done!** API is running on `http://localhost:5000`
+**Done!** API is running on `http://localhost:5001`
 
 ## Option 2: Local Development 💻
 
@@ -63,19 +63,19 @@ cp .env.example .env
 npm run dev
 ```
 
-**Done!** API is running on `http://localhost:5000`
+**Done!** API is running on `http://localhost:5001`
 
 ## Verify Installation ✅
 
 ```bash
 # Health check
-curl http://localhost:5000/health
+curl http://localhost:5001/health
 
 # Expected response:
 # {"success":true,"message":"Server is healthy","timestamp":"...","uptime":...}
 
 # API info
-curl http://localhost:5000/api/v1
+curl http://localhost:5001/api/v1
 
 # Expected response:
 # {"success":true,"message":"Digital Signature & Document Management Platform API",...}
@@ -83,9 +83,9 @@ curl http://localhost:5000/api/v1
 
 ## Access Services
 
-- **API**: http://localhost:5000
-- **Health Check**: http://localhost:5000/health
-- **API Routes**: http://localhost:5000/api/v1
+- **API**: http://localhost:5001
+- **Health Check**: http://localhost:5001/health
+- **API Routes**: http://localhost:5001/api/v1
 - **MongoDB**: localhost:27017 (admin/admin123 in Docker)
 - **Redis**: localhost:6379
 

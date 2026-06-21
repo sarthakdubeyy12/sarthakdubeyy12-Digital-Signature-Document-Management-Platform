@@ -199,7 +199,7 @@ docker-compose up -d
 npm run dev
 
 # 5. Check health
-curl http://localhost:5000/health
+curl http://localhost:5001/health
 ```
 
 ## What's Ready to Use
@@ -326,10 +326,10 @@ docker exec -it digital-signature-redis redis-cli ping
 ### 4. Test API
 ```bash
 # Health check
-curl http://localhost:5000/health
+curl http://localhost:5001/health
 
 # API info
-curl http://localhost:5000/api/v1
+curl http://localhost:5001/api/v1
 ```
 
 ## Verification Checklist

@@ -117,7 +117,7 @@ All configuration is managed through environment variables. See `.env.example` f
 npm run dev
 ```
 
-The server will start on `http://localhost:5000` with hot-reloading enabled.
+The server will start on `http://localhost:5001` with hot-reloading enabled.
 
 ### Production Mode
 
@@ -214,7 +214,7 @@ server/
 ### Base URL
 
 ```
-http://localhost:5000/api/v1
+http://localhost:5001/api/v1
 ```
 
 ### Endpoints

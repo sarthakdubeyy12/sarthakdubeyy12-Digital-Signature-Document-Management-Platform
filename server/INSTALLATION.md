@@ -153,7 +153,7 @@ This creates:
 npm run dev
 ```
 
-Server will start on `http://localhost:5000` with hot-reload.
+Server will start on `http://localhost:5001` with hot-reload.
 
 #### Production Mode
 
@@ -165,7 +165,7 @@ npm start
 
 ```bash
 # Check health endpoint
-curl http://localhost:5000/health
+curl http://localhost:5001/health
 
 # Expected response:
 # {"success":true,"message":"Server is healthy"}
@@ -199,7 +199,7 @@ This starts:
 
 ```bash
 # Check API health
-curl http://localhost:5000/health
+curl http://localhost:5001/health
 
 # Or through Nginx
 curl http://localhost/health
@@ -338,13 +338,13 @@ npm run test:integration
 
 ```bash
 # Health check
-curl http://localhost:5000/health
+curl http://localhost:5001/health
 
 # API welcome
-curl http://localhost:5000/api/v1
+curl http://localhost:5001/api/v1
 
 # Register user (should work)
-curl -X POST http://localhost:5000/api/v1/auth/register \
+curl -X POST http://localhost:5001/api/v1/auth/register \
   -H "Content-Type: application/json" \
   -d '{
     "email": "test@example.com",
