@@ -15,11 +15,19 @@
     "format": "prettier --write \"src/**/*.js\"",
     "format:check": "prettier --check \"src/**/*.js\"",
     "setup": "node scripts/setup.js",
-    "seed": "node scripts/seed.js",
+    "seed": "node prisma/seed.js",
+    "prisma:generate": "prisma generate",
+    "prisma:push": "prisma db push",
+    "prisma:studio": "prisma studio",
+    "prisma:seed": "node prisma/seed.js",
+    "postinstall": "prisma generate",
     "docker:build": "docker build -t digital-signature-platform .",
     "docker:up": "docker-compose up -d",
     "docker:down": "docker-compose down",
     "docker:logs": "docker-compose logs -f"
+  },
+  "prisma": {
+    "seed": "node prisma/seed.js"
   },
   "keywords": [
     "digital-signature",

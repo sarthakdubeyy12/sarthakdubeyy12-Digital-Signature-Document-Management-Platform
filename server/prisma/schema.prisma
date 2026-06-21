@@ -1,0 +1,317 @@
+// Prisma Schema for Digital Signature Platform
+// Database: MongoDB
+// ORM: Prisma
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+// ============================================
+// ENUMS
+// ============================================
+
+enum UserRole {
+  USER
+  ADMIN
+}
+
+enum DocumentStatus {
+  UPLOADED
+  SIGNING
+  SIGNED
+  FAILED
+}
+
+enum AuditAction {
+  // Auth actions
+  USER_REGISTER
+  USER_LOGIN
+  USER_LOGOUT
+  USER_REFRESH_TOKEN
+  PASSWORD_RESET_REQUEST
+  PASSWORD_RESET_COMPLETE
+  PASSWORD_CHANGE
+
+  // User actions
+  USER_UPDATE
+  USER_DELETE
+  USER_VIEW
+
+  // Document actions
+  DOCUMENT_UPLOAD
+  DOCUMENT_VIEW
+  DOCUMENT_DOWNLOAD
+  DOCUMENT_DELETE
+  DOCUMENT_UPDATE
+
+  // Signature actions
+  SIGNATURE_CREATE
+  SIGNATURE_APPLY
+  SIGNATURE_DELETE
+  DOCUMENT_SIGN
+
+  // Verification actions
+  DOCUMENT_VERIFY
+  VERIFICATION_SUCCESS
+  VERIFICATION_FAILED
+
+  // Admin actions
+  ADMIN_USER_VIEW
+  ADMIN_DOCUMENT_VIEW
+  ADMIN_AUDIT_VIEW
+}
+
+enum AuditResource {
+  USER
+  DOCUMENT
+  SIGNATURE
+  VERIFICATION
+  SYSTEM
+}
+
+// ============================================
+// USER MODEL
+// ============================================
+
+model User {
+  id                   String                 @id @default(auto()) @map("_id") @db.ObjectId
+  email                String                 @unique
+  password             String                 // Hashed with bcrypt
+  firstName            String
+  lastName             String
+  role                 UserRole               @default(USER)
+  isEmailVerified      Boolean                @default(false)
+  isActive             Boolean                @default(true)
+  profilePicture       String?                // URL to profile picture
+  
+  // Timestamps
+  createdAt            DateTime               @default(now())
+  updatedAt            DateTime               @updatedAt
+  deletedAt            DateTime?              // Soft delete support
+  
+  // Relationships
+  documents            Document[]
+  signatures           Signature[]
+  refreshTokens        RefreshToken[]
+  passwordResetTokens  PasswordResetToken[]
+  auditLogs            AuditLog[]
+
+  @@index([email])
+  @@index([role])
+  @@index([isActive])
+  @@index([deletedAt])
+  @@index([createdAt])
+  @@map("users")
+}
+
+// ============================================
+// DOCUMENT MODEL
+// ============================================
+
+model Document {
+  id               String          @id @default(auto()) @map("_id") @db.ObjectId
+  userId           String          @db.ObjectId
+  title            String
+  originalName     String          // Original file name
+  fileName         String          @unique // Unique storage identifier
+  filePath         String          // Path to original file
+  fileSize         Int             // File size in bytes
+  mimeType         String          // application/pdf
+  status           DocumentStatus  @default(UPLOADED)
+  verificationCode String          @unique // For public verification
+  signedFilePath   String?         // Path to signed file
+  signedAt         DateTime?       // When document was signed
+  
+  // Embedded metadata
+  metadata         DocumentMetadata?
+  
+  // Timestamps
+  createdAt        DateTime        @default(now())
+  updatedAt        DateTime        @updatedAt
+  deletedAt        DateTime?       // Soft delete support
+  
+  // Relationships
+  user             User            @relation(fields: [userId], references: [id])
+  signatures       Signature[]
+  verification     Verification?
+
+  @@index([userId])
+  @@index([verificationCode])
+  @@index([status])
+  @@index([createdAt])
+  @@index([deletedAt])
+  @@index([userId, status, createdAt])
+  @@map("documents")
+}
+
+// Embedded type for document metadata
+type DocumentMetadata {
+  pageCount Int?
+  width     Float?
+  height    Float?
+}
+
+// ============================================
+// SIGNATURE MODEL
+// ============================================
+
+model Signature {
+  id            String             @id @default(auto()) @map("_id") @db.ObjectId
+  userId        String             @db.ObjectId
+  documentId    String?            @db.ObjectId // Null for reusable signatures
+  name          String
+  signatureData String             // Base64 image or file path
+  isReusable    Boolean            @default(false)
+  
+  // Embedded position data
+  position      SignaturePosition?
+  
+  appliedAt     DateTime?          // When signature was applied to document
+  
+  // Timestamps
+  createdAt     DateTime           @default(now())
+  updatedAt     DateTime           @updatedAt
+  deletedAt     DateTime?          // Soft delete support
+  
+  // Relationships
+  user          User               @relation(fields: [userId], references: [id])
+  document      Document?          @relation(fields: [documentId], references: [id])
+
+  @@index([userId])
+  @@index([documentId])
+  @@index([isReusable])
+  @@index([deletedAt])
+  @@index([userId, isReusable])
+  @@map("signatures")
+}
+
+// Embedded type for signature position
+type SignaturePosition {
+  page   Int
+  x      Float
+  y      Float
+  width  Float
+  height Float
+}
+
+// ============================================
+// VERIFICATION MODEL
+// ============================================
+
+model Verification {
+  id               String             @id @default(auto()) @map("_id") @db.ObjectId
+  documentId       String             @unique @db.ObjectId
+  verificationCode String             @unique
+  verifiedCount    Int                @default(0)
+  lastVerifiedAt   DateTime?
+  lastVerifiedBy   String?            // IP address or identifier
+  
+  // Embedded metadata
+  metadata         VerificationMetadata?
+  
+  // Timestamps
+  createdAt        DateTime           @default(now())
+  updatedAt        DateTime           @updatedAt
+  
+  // Relationships
+  document         Document           @relation(fields: [documentId], references: [id])
+
+  @@index([documentId])
+  @@index([verificationCode])
+  @@index([createdAt])
+  @@map("verifications")
+}
+
+// Embedded type for verification metadata
+type VerificationMetadata {
+  userAgent String?
+  ipAddress String?
+}
+
+// ============================================
+// AUDIT LOG MODEL
+// ============================================
+
+model AuditLog {
+  id           String         @id @default(auto()) @map("_id") @db.ObjectId
+  userId       String?        @db.ObjectId // Nullable for anonymous actions
+  action       AuditAction
+  resource     AuditResource
+  resourceId   String?        @db.ObjectId
+  
+  // Flexible metadata as JSON
+  metadata     Json?
+  
+  ipAddress    String
+  userAgent    String
+  success      Boolean        @default(true)
+  errorMessage String?
+  
+  // Timestamp (immutable - no updatedAt)
+  createdAt    DateTime       @default(now())
+  
+  // Relationships
+  user         User?          @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+  @@index([action])
+  @@index([resource])
+  @@index([createdAt])
+  @@index([userId, action, createdAt])
+  @@index([resource, resourceId, createdAt])
+  @@map("auditLogs")
+}
+
+// ============================================
+// REFRESH TOKEN MODEL
+// ============================================
+
+model RefreshToken {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId    String   @db.ObjectId
+  token     String   @unique
+  expiresAt DateTime
+  isRevoked Boolean  @default(false)
+  
+  // Timestamp (immutable - no updatedAt)
+  createdAt DateTime @default(now())
+  
+  // Relationships
+  user      User     @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+  @@index([token])
+  @@index([expiresAt]) // TTL index for automatic cleanup
+  @@index([userId, isRevoked])
+  @@map("refreshTokens")
+}
+
+// ============================================
+// PASSWORD RESET TOKEN MODEL
+// ============================================
+
+model PasswordResetToken {
+  id        String    @id @default(auto()) @map("_id") @db.ObjectId
+  userId    String    @db.ObjectId
+  token     String    @unique
+  expiresAt DateTime
+  isUsed    Boolean   @default(false)
+  usedAt    DateTime?
+  
+  // Timestamp (immutable - no updatedAt)
+  createdAt DateTime  @default(now())
+  
+  // Relationships
+  user      User      @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+  @@index([token])
+  @@index([expiresAt]) // TTL index for automatic cleanup
+  @@index([userId, isUsed])
+  @@map("passwordResetTokens")
+}
