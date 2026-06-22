@@ -1,0 +1,165 @@
+### Admin Module API Tests
+### Base URL
+@baseUrl = http://localhost:5001/api/v1
+@adminToken = YOUR_ADMIN_TOKEN_HERE
+@userId = YOUR_USER_ID_HERE
+
+### ==============================================
+### DASHBOARD & OVERVIEW
+### ==============================================
+
+### 1. Get Comprehensive Overview
+GET {{baseUrl}}/admin/overview
+Authorization: Bearer {{adminToken}}
+
+### 2. Get Dashboard Statistics (30 days)
+GET {{baseUrl}}/admin/dashboard?period=30d
+Authorization: Bearer {{adminToken}}
+
+### 3. Get Dashboard Statistics (7 days)
+GET {{baseUrl}}/admin/dashboard?period=7d
+Authorization: Bearer {{adminToken}}
+
+### 4. Get Activity Trends
+GET {{baseUrl}}/admin/trends?days=30
+Authorization: Bearer {{adminToken}}
+
+### ==============================================
+### USER MANAGEMENT
+### ==============================================
+
+### 5. List All Users
+GET {{baseUrl}}/admin/users?page=1&limit=20&sortBy=createdAt&sortOrder=desc
+Authorization: Bearer {{adminToken}}
+
+### 6. Search Users
+GET {{baseUrl}}/admin/users?search=demo&page=1&limit=20
+Authorization: Bearer {{adminToken}}
+
+### 7. Filter Users by Role
+GET {{baseUrl}}/admin/users?role=USER&page=1&limit=20
+Authorization: Bearer {{adminToken}}
+
+### 8. Filter Active Users
+GET {{baseUrl}}/admin/users?isActive=true&page=1&limit=20
+Authorization: Bearer {{adminToken}}
+
+### 9. Get User by ID
+GET {{baseUrl}}/admin/users/{{userId}}
+Authorization: Bearer {{adminToken}}
+
+### 10. Update User
+PATCH {{baseUrl}}/admin/users/{{userId}}
+Authorization: Bearer {{adminToken}}
+Content-Type: application/json
+
+{
+  "isActive": true,
+  "role": "USER"
+}
+
+### ==============================================
+### DOCUMENT MANAGEMENT
+### ==============================================
+
+### 11. List All Documents
+GET {{baseUrl}}/admin/documents?page=1&limit=20
+Authorization: Bearer {{adminToken}}
+
+### 12. Filter Documents by Status
+GET {{baseUrl}}/admin/documents?status=SIGNED&page=1&limit=20
+Authorization: Bearer {{adminToken}}
+
+### 13. Filter Documents by User
+GET {{baseUrl}}/admin/documents?userId={{userId}}&page=1&limit=20
+Authorization: Bearer {{adminToken}}
+
+### 14. Search Documents
+GET {{baseUrl}}/admin/documents?search=test&page=1&limit=20
+Authorization: Bearer {{adminToken}}
+
+### ==============================================
+### SIGNATURE MANAGEMENT
+### ==============================================
+
+### 15. List All Signatures
+GET {{baseUrl}}/admin/signatures?page=1&limit=20
+Authorization: Bearer {{adminToken}}
+
+### 16. Filter Reusable Signatures
+GET {{baseUrl}}/admin/signatures?isReusable=true&page=1&limit=20
+Authorization: Bearer {{adminToken}}
+
+### 17. Filter Signatures by User
+GET {{baseUrl}}/admin/signatures?userId={{userId}}&page=1&limit=20
+Authorization: Bearer {{adminToken}}
+
+### ==============================================
+### STATISTICS
+### ==============================================
+
+### 18. Get User Statistics
+GET {{baseUrl}}/admin/stats/users
+Authorization: Bearer {{adminToken}}
+
+### 19. Get Document Statistics
+GET {{baseUrl}}/admin/stats/documents
+Authorization: Bearer {{adminToken}}
+
+### 20. Get Signature Statistics
+GET {{baseUrl}}/admin/stats/signatures
+Authorization: Bearer {{adminToken}}
+
+### ==============================================
+### SYSTEM MONITORING
+### ==============================================
+
+### 21. Get System Health
+GET {{baseUrl}}/admin/health
+Authorization: Bearer {{adminToken}}
+
+### 22. Get System Health (Detailed)
+GET {{baseUrl}}/admin/health?detailed=true
+Authorization: Bearer {{adminToken}}
+
+### 23. Get System Metrics
+GET {{baseUrl}}/admin/metrics
+Authorization: Bearer {{adminToken}}
+
+### ==============================================
+### CACHE MANAGEMENT
+### ==============================================
+
+### 24. Clear Admin Cache
+DELETE {{baseUrl}}/admin/cache
+Authorization: Bearer {{adminToken}}
+
+### ==============================================
+### CURL Examples
+### ==============================================
+
+# Get Overview
+# curl -X GET "http://localhost:5001/api/v1/admin/overview" \
+#   -H "Authorization: Bearer YOUR_ADMIN_TOKEN"
+
+# List Users
+# curl -X GET "http://localhost:5001/api/v1/admin/users?page=1&limit=20" \
+#   -H "Authorization: Bearer YOUR_ADMIN_TOKEN"
+
+# Get Dashboard Stats
+# curl -X GET "http://localhost:5001/api/v1/admin/dashboard?period=30d" \
+#   -H "Authorization: Bearer YOUR_ADMIN_TOKEN"
+
+# Get System Health
+# curl -X GET "http://localhost:5001/api/v1/admin/health?detailed=true" \
+#   -H "Authorization: Bearer YOUR_ADMIN_TOKEN"
+
+# Update User
+# curl -X PATCH "http://localhost:5001/api/v1/admin/users/USER_ID" \
+#   -H "Authorization: Bearer YOUR_ADMIN_TOKEN" \
+#   -H "Content-Type: application/json" \
+#   -d '{"isActive": false}'
+
+# Clear Cache
+# curl -X DELETE "http://localhost:5001/api/v1/admin/cache" \
+#   -H "Authorization: Bearer YOUR_ADMIN_TOKEN"

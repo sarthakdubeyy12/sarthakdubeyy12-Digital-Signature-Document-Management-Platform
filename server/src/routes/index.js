@@ -4,6 +4,7 @@ const documentRoutes = require('../modules/document/document.routes');
 const signatureRoutes = require('../modules/signature/signature.routes');
 const verificationRoutes = require('../modules/verification/verification.routes');
 const auditRoutes = require('../modules/audit/audit.routes');
+const adminRoutes = require('../modules/admin/admin.routes');
 
 const router = express.Router();
 
@@ -32,9 +33,9 @@ router.use('/documents', documentRoutes);
 router.use('/signatures', signatureRoutes);
 router.use('/verify', verificationRoutes);
 router.use('/audit', auditRoutes);
+router.use('/admin', adminRoutes);
 
 // Additional routes will be added here
 // router.use('/users', userRoutes);
-// router.use('/admin', adminRoutes);
 
 module.exports = router;
