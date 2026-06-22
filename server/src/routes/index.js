@@ -1,4 +1,6 @@
 const express = require('express');
+const authRoutes = require('../modules/auth/auth.routes');
+const documentRoutes = require('../modules/document/document.routes');
 
 const router = express.Router();
 
@@ -21,10 +23,12 @@ router.get('/', (req, res) => {
   });
 });
 
-// Module routes will be added here
-// router.use('/auth', authRoutes);
+// Mount routes
+router.use('/auth', authRoutes);
+router.use('/documents', documentRoutes);
+
+// Additional routes will be added here
 // router.use('/users', userRoutes);
-// router.use('/documents', documentRoutes);
 // router.use('/signatures', signatureRoutes);
 // router.use('/verification', verificationRoutes);
 // router.use('/audit', auditRoutes);

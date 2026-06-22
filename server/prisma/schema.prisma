@@ -101,7 +101,6 @@ model User {
   passwordResetTokens  PasswordResetToken[]
   auditLogs            AuditLog[]
 
-  @@index([email])
   @@index([role])
   @@index([isActive])
   @@index([deletedAt])
@@ -141,7 +140,6 @@ model Document {
   verification     Verification?
 
   @@index([userId])
-  @@index([verificationCode])
   @@index([status])
   @@index([createdAt])
   @@index([deletedAt])
@@ -151,9 +149,10 @@ model Document {
 
 // Embedded type for document metadata
 type DocumentMetadata {
-  pageCount Int?
-  width     Float?
-  height    Float?
+  pageCount   Int?
+  width       Float?
+  height      Float?
+  description String?
 }
 
 // ============================================
@@ -221,8 +220,6 @@ model Verification {
   // Relationships
   document         Document           @relation(fields: [documentId], references: [id])
 
-  @@index([documentId])
-  @@index([verificationCode])
   @@index([createdAt])
   @@map("verifications")
 }
@@ -285,7 +282,6 @@ model RefreshToken {
   user      User     @relation(fields: [userId], references: [id])
 
   @@index([userId])
-  @@index([token])
   @@index([expiresAt]) // TTL index for automatic cleanup
   @@index([userId, isRevoked])
   @@map("refreshTokens")
@@ -310,7 +306,6 @@ model PasswordResetToken {
   user      User      @relation(fields: [userId], references: [id])
 
   @@index([userId])
-  @@index([token])
   @@index([expiresAt]) // TTL index for automatic cleanup
   @@index([userId, isUsed])
   @@map("passwordResetTokens")

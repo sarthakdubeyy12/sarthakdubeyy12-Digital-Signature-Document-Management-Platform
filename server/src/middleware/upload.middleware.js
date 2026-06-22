@@ -1,23 +1,13 @@
 const multer = require('multer');
-const path = require('path');
-const { v4: uuidv4 } = require('uuid');
 const config = require('../config');
 const { AppError } = require('../shared/errors');
 
-// Storage configuration
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, path.join(config.storage.localPath, 'temp'));
-  },
-  filename: (req, file, cb) => {
-    const uniqueName = `${uuidv4()}${path.extname(file.originalname)}`;
-    cb(null, uniqueName);
-  },
-});
+// Use memory storage to get file buffer
+const storage = multer.memoryStorage();
 
 // File filter
 const fileFilter = (req, file, cb) => {
-  const allowedTypes = config.upload.allowedTypes;
+  const allowedTypes = config.upload.allowedTypes || ['application/pdf'];
 
   if (allowedTypes.includes(file.mimetype)) {
     cb(null, true);
@@ -33,25 +23,38 @@ const fileFilter = (req, file, cb) => {
 };
 
 // Multer configuration
-const upload = multer({
+const uploadMiddleware = multer({
   storage,
   fileFilter,
   limits: {
-    fileSize: config.upload.maxFileSize,
+    fileSize: config.upload.maxFileSize || 10 * 1024 * 1024, // 10MB default
   },
 });
 
-// Single file upload middleware
-const uploadSingle = (fieldName) => upload.single(fieldName);
-
-// Multiple files upload middleware
-const uploadMultiple = (fieldName, maxCount = 10) => upload.array(fieldName, maxCount);
-
-// Fields upload middleware
-const uploadFields = (fields) => upload.fields(fields);
+// Error handling middleware for multer errors
+const handleMulterError = (err, req, res, next) => {
+  if (err instanceof multer.MulterError) {
+    if (err.code === 'LIMIT_FILE_SIZE') {
+      return res.status(400).json({
+        success: false,
+        message: 'File size exceeds maximum allowed size',
+      });
+    }
+    if (err.code === 'LIMIT_UNEXPECTED_FILE') {
+      return res.status(400).json({
+        success: false,
+        message: 'Unexpected file field',
+      });
+    }
+    return res.status(400).json({
+      success: false,
+      message: err.message,
+    });
+  }
+  next(err);
+};
 
 module.exports = {
-  uploadSingle,
-  uploadMultiple,
-  uploadFields,
+  uploadMiddleware,
+  handleMulterError,
 };

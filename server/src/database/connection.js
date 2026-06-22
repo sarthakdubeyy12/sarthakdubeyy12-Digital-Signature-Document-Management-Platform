@@ -1,5 +1,4 @@
-const mongoose = require('mongoose');
-const databaseConfig = require('../config/database');
+const prisma = require('./prisma.client');
 const logger = require('../services/logger/logger.service');
 
 class DatabaseConnection {
@@ -9,37 +8,25 @@ class DatabaseConnection {
 
   async connect() {
     try {
-      // Mongoose connection events
-      mongoose.connection.on('connected', () => {
-        logger.info('MongoDB connected successfully');
-      });
-
-      mongoose.connection.on('error', (err) => {
-        logger.error('MongoDB connection error', err);
-      });
-
-      mongoose.connection.on('disconnected', () => {
-        logger.warn('MongoDB disconnected');
-      });
-
-      // Connect to MongoDB
-      this.connection = await mongoose.connect(databaseConfig.uri, databaseConfig.options);
-
-      logger.info(`MongoDB connected to: ${this.connection.connection.host}`);
-
+      // Test Prisma connection
+      await prisma.$connect();
+      
+      logger.info('Prisma connected to MongoDB successfully');
+      
+      this.connection = prisma;
       return this.connection;
     } catch (error) {
-      logger.error('Failed to connect to MongoDB', error);
+      logger.error('Failed to connect to MongoDB via Prisma', error);
       process.exit(1);
     }
   }
 
   async disconnect() {
     try {
-      await mongoose.connection.close();
-      logger.info('MongoDB disconnected gracefully');
+      await prisma.$disconnect();
+      logger.info('Prisma disconnected from MongoDB gracefully');
     } catch (error) {
-      logger.error('Error disconnecting from MongoDB', error);
+      logger.error('Error disconnecting Prisma from MongoDB', error);
       throw error;
     }
   }
@@ -49,7 +36,7 @@ class DatabaseConnection {
   }
 
   isConnected() {
-    return mongoose.connection.readyState === 1;
+    return this.connection !== null;
   }
 }
 

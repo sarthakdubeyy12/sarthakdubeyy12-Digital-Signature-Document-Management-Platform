@@ -1,0 +1,115 @@
+### Document Management API Tests
+### Base URL
+@baseUrl = http://localhost:5001/api/v1
+@accessToken = YOUR_ACCESS_TOKEN_HERE
+
+### ==============================================
+### 1. Upload Document
+### ==============================================
+POST {{baseUrl}}/documents
+Authorization: Bearer {{accessToken}}
+Content-Type: multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW
+
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="title"
+
+Sample Contract Document
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="description"
+
+This is a sample contract for testing purposes
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="document"; filename="sample.pdf"
+Content-Type: application/pdf
+
+< ./sample.pdf
+------WebKitFormBoundary7MA4YWxkTrZu0gW--
+
+### ==============================================
+### 2. List Documents (with pagination)
+### ==============================================
+GET {{baseUrl}}/documents?page=1&limit=10&sortBy=createdAt&sortOrder=desc
+Authorization: Bearer {{accessToken}}
+
+### ==============================================
+### 3. List Documents (with filters)
+### ==============================================
+GET {{baseUrl}}/documents?status=UPLOADED&search=contract
+Authorization: Bearer {{accessToken}}
+
+### ==============================================
+### 4. Get Document by ID
+### ==============================================
+@documentId = DOCUMENT_ID_HERE
+GET {{baseUrl}}/documents/{{documentId}}
+Authorization: Bearer {{accessToken}}
+
+### ==============================================
+### 5. Update Document Metadata
+### ==============================================
+PATCH {{baseUrl}}/documents/{{documentId}}
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "title": "Updated Contract Title",
+  "description": "Updated description for the contract"
+}
+
+### ==============================================
+### 6. Get User Document Statistics
+### ==============================================
+GET {{baseUrl}}/documents/stats
+Authorization: Bearer {{accessToken}}
+
+### ==============================================
+### 7. Download Document (Original)
+### ==============================================
+GET {{baseUrl}}/documents/{{documentId}}/download?version=original
+Authorization: Bearer {{accessToken}}
+
+### ==============================================
+### 8. Download Document (Signed)
+### ==============================================
+GET {{baseUrl}}/documents/{{documentId}}/download?version=signed
+Authorization: Bearer {{accessToken}}
+
+### ==============================================
+### 9. Delete Document
+### ==============================================
+DELETE {{baseUrl}}/documents/{{documentId}}
+Authorization: Bearer {{accessToken}}
+
+### ==============================================
+### CURL Examples
+### ==============================================
+
+# Upload Document
+# curl -X POST http://localhost:5001/api/v1/documents \
+#   -H "Authorization: Bearer YOUR_TOKEN" \
+#   -F "document=@./sample.pdf" \
+#   -F "title=Sample Contract" \
+#   -F "description=Test document"
+
+# List Documents
+# curl -X GET "http://localhost:5001/api/v1/documents?page=1&limit=10" \
+#   -H "Authorization: Bearer YOUR_TOKEN"
+
+# Get Document
+# curl -X GET http://localhost:5001/api/v1/documents/DOCUMENT_ID \
+#   -H "Authorization: Bearer YOUR_TOKEN"
+
+# Update Document
+# curl -X PATCH http://localhost:5001/api/v1/documents/DOCUMENT_ID \
+#   -H "Authorization: Bearer YOUR_TOKEN" \
+#   -H "Content-Type: application/json" \
+#   -d '{"title":"Updated Title"}'
+
+# Download Document
+# curl -X GET "http://localhost:5001/api/v1/documents/DOCUMENT_ID/download?version=original" \
+#   -H "Authorization: Bearer YOUR_TOKEN" \
+#   -o document.pdf
+
+# Delete Document
+# curl -X DELETE http://localhost:5001/api/v1/documents/DOCUMENT_ID \
+#   -H "Authorization: Bearer YOUR_TOKEN"

@@ -3,9 +3,9 @@ const logger = require('../services/logger/logger.service');
 
 // Custom Morgan token for response time
 morgan.token('response-time-ms', (req, res) => {
-  if (!req._startTime) return '0';
-  const diff = process.hrtime(req._startTime);
-  return ((diff[0] * 1e3 + diff[1] * 1e-6)).toFixed(2);
+  if (!req._startAt) return '0';
+  const diff = process.hrtime(req._startAt);
+  return (diff[0] * 1e3 + diff[1] * 1e-6).toFixed(2);
 });
 
 // Morgan stream for Winston
@@ -23,7 +23,7 @@ const loggerMiddleware = morgan(morganFormat, { stream });
 
 // Request start time middleware
 const requestTimeMiddleware = (req, res, next) => {
-  req._startTime = process.hrtime();
+  req._startAt = process.hrtime();
   next();
 };
 

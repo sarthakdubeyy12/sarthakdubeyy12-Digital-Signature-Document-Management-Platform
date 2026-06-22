@@ -12,19 +12,24 @@ async function main() {
   console.log('Creating admin user...');
   const adminPassword = await bcrypt.hash('Admin@123456', 10);
   
-  const admin = await prisma.user.upsert({
+  // Check if admin already exists
+  let admin = await prisma.user.findFirst({
     where: { email: 'admin@digitalsignature.com' },
-    update: {},
-    create: {
-      email: 'admin@digitalsignature.com',
-      password: adminPassword,
-      firstName: 'System',
-      lastName: 'Administrator',
-      role: 'ADMIN',
-      isEmailVerified: true,
-      isActive: true,
-    },
   });
+
+  if (!admin) {
+    admin = await prisma.user.create({
+      data: {
+        email: 'admin@digitalsignature.com',
+        password: adminPassword,
+        firstName: 'System',
+        lastName: 'Administrator',
+        role: 'ADMIN',
+        isEmailVerified: true,
+        isActive: true,
+      },
+    });
+  }
 
   console.log('✅ Admin user created');
   console.log('   Email:', admin.email);
@@ -38,33 +43,41 @@ async function main() {
   console.log('Creating test users...');
   const testPassword = await bcrypt.hash('Test@123456', 10);
   
-  const testUser1 = await prisma.user.upsert({
+  let testUser1 = await prisma.user.findFirst({
     where: { email: 'john.doe@example.com' },
-    update: {},
-    create: {
-      email: 'john.doe@example.com',
-      password: testPassword,
-      firstName: 'John',
-      lastName: 'Doe',
-      role: 'USER',
-      isEmailVerified: true,
-      isActive: true,
-    },
   });
 
-  const testUser2 = await prisma.user.upsert({
+  if (!testUser1) {
+    testUser1 = await prisma.user.create({
+      data: {
+        email: 'john.doe@example.com',
+        password: testPassword,
+        firstName: 'John',
+        lastName: 'Doe',
+        role: 'USER',
+        isEmailVerified: true,
+        isActive: true,
+      },
+    });
+  }
+
+  let testUser2 = await prisma.user.findFirst({
     where: { email: 'jane.smith@example.com' },
-    update: {},
-    create: {
-      email: 'jane.smith@example.com',
-      password: testPassword,
-      firstName: 'Jane',
-      lastName: 'Smith',
-      role: 'USER',
-      isEmailVerified: true,
-      isActive: true,
-    },
   });
+
+  if (!testUser2) {
+    testUser2 = await prisma.user.create({
+      data: {
+        email: 'jane.smith@example.com',
+        password: testPassword,
+        firstName: 'Jane',
+        lastName: 'Smith',
+        role: 'USER',
+        isEmailVerified: true,
+        isActive: true,
+      },
+    });
+  }
 
   console.log('✅ Test users created');
   console.log('   User 1:', testUser1.email);

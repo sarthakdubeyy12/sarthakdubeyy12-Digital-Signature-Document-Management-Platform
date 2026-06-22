@@ -1,0 +1,161 @@
+### Digital Signature Platform - Auth API Tests
+### Base URL
+@baseUrl = http://localhost:5001/api/v1
+@accessToken = 
+@refreshToken = 
+
+###############################################
+# 1. REGISTER
+###############################################
+POST {{baseUrl}}/auth/register
+Content-Type: application/json
+
+{
+  "email": "test@example.com",
+  "password": "Test@123456",
+  "firstName": "Test",
+  "lastName": "User"
+}
+
+###############################################
+# 2. LOGIN
+###############################################
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "test@example.com",
+  "password": "Test@123456"
+}
+
+###############################################
+# 3. LOGIN (Admin)
+###############################################
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "admin@digitalsignature.com",
+  "password": "Admin@123456"
+}
+
+###############################################
+# 4. REFRESH TOKEN
+###############################################
+POST {{baseUrl}}/auth/refresh
+Content-Type: application/json
+
+{
+  "refreshToken": "{{refreshToken}}"
+}
+
+###############################################
+# 5. GET CURRENT USER (Protected)
+###############################################
+GET {{baseUrl}}/auth/me
+Authorization: Bearer {{accessToken}}
+
+###############################################
+# 6. CHANGE PASSWORD (Protected)
+###############################################
+POST {{baseUrl}}/auth/change-password
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "currentPassword": "Test@123456",
+  "newPassword": "NewTest@123456"
+}
+
+###############################################
+# 7. FORGOT PASSWORD
+###############################################
+POST {{baseUrl}}/auth/forgot-password
+Content-Type: application/json
+
+{
+  "email": "test@example.com"
+}
+
+###############################################
+# 8. RESET PASSWORD
+###############################################
+POST {{baseUrl}}/auth/reset-password
+Content-Type: application/json
+
+{
+  "token": "your-reset-token-here",
+  "password": "NewPassword@123"
+}
+
+###############################################
+# 9. LOGOUT (Protected)
+###############################################
+POST {{baseUrl}}/auth/logout
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "refreshToken": "{{refreshToken}}"
+}
+
+###############################################
+# ERROR CASES
+###############################################
+
+### Register with existing email
+POST {{baseUrl}}/auth/register
+Content-Type: application/json
+
+{
+  "email": "admin@digitalsignature.com",
+  "password": "Test@123456",
+  "firstName": "Test",
+  "lastName": "User"
+}
+
+### Login with wrong password
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "test@example.com",
+  "password": "WrongPassword123"
+}
+
+### Invalid email format
+POST {{baseUrl}}/auth/register
+Content-Type: application/json
+
+{
+  "email": "invalid-email",
+  "password": "Test@123456",
+  "firstName": "Test",
+  "lastName": "User"
+}
+
+### Weak password
+POST {{baseUrl}}/auth/register
+Content-Type: application/json
+
+{
+  "email": "new@example.com",
+  "password": "weak",
+  "firstName": "Test",
+  "lastName": "User"
+}
+
+### Missing required fields
+POST {{baseUrl}}/auth/register
+Content-Type: application/json
+
+{
+  "email": "test@example.com"
+}
+
+### Access protected route without token
+GET {{baseUrl}}/auth/me
+
+### Invalid token
+GET {{baseUrl}}/auth/me
+Authorization: Bearer invalid-token-here

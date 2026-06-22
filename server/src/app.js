@@ -10,6 +10,7 @@ const config = require('./config');
 const { loggerMiddleware, requestTimeMiddleware } = require('./middleware/logger.middleware');
 const { errorHandler, notFoundHandler } = require('./middleware/error.middleware');
 const { generalLimiter } = require('./middleware/rateLimit.middleware');
+const { auditLog } = require('./middleware/audit.middleware');
 const routes = require('./routes');
 
 const app = express();
@@ -33,6 +34,9 @@ app.use(cookieParser());
 // Logging
 app.use(requestTimeMiddleware);
 app.use(loggerMiddleware);
+
+// Audit logging
+app.use(auditLog);
 
 // Rate limiting
 app.use('/api', generalLimiter);
