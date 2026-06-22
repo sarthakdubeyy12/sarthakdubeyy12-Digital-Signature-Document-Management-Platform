@@ -1,0 +1,79 @@
+### Document Verification API Tests
+### Base URL
+@baseUrl = http://localhost:5001/api/v1
+@accessToken = YOUR_ACCESS_TOKEN_HERE
+@documentId = YOUR_DOCUMENT_ID_HERE
+@verificationCode = YOUR_VERIFICATION_CODE_HERE
+
+### ==============================================
+### 1. Create Verification for Document (Private)
+### ==============================================
+POST {{baseUrl}}/verify/document/{{documentId}}
+Authorization: Bearer {{accessToken}}
+
+### ==============================================
+### 2. Get Verification Details by Document ID (Private)
+### ==============================================
+GET {{baseUrl}}/verify/document/{{documentId}}
+Authorization: Bearer {{accessToken}}
+
+### ==============================================
+### 3. Verify Document by Code (Public)
+### ==============================================
+GET {{baseUrl}}/verify/{{verificationCode}}
+
+### ==============================================
+### 4. Get QR Code for Verification (Public)
+### ==============================================
+GET {{baseUrl}}/verify/{{verificationCode}}/qrcode
+
+### ==============================================
+### 5. Download QR Code as PNG (Public)
+### ==============================================
+GET {{baseUrl}}/verify/{{verificationCode}}/qrcode?format=buffer&width=300
+
+### ==============================================
+### 6. Regenerate QR Code (Private)
+### ==============================================
+POST {{baseUrl}}/verify/document/{{documentId}}/regenerate-qr
+Authorization: Bearer {{accessToken}}
+
+### ==============================================
+### 7. Get Verification Statistics (Admin)
+### ==============================================
+GET {{baseUrl}}/verify/admin/stats
+Authorization: Bearer {{accessToken}}
+
+### ==============================================
+### 8. Get Verification Statistics with Date Range (Admin)
+### ==============================================
+GET {{baseUrl}}/verify/admin/stats?startDate=2026-01-01T00:00:00.000Z&endDate=2026-12-31T23:59:59.999Z
+Authorization: Bearer {{accessToken}}
+
+### ==============================================
+### 9. Invalidate Verification Cache (Admin)
+### ==============================================
+DELETE {{baseUrl}}/verify/admin/{{verificationCode}}/cache
+Authorization: Bearer {{accessToken}}
+
+### ==============================================
+### CURL Examples
+### ==============================================
+
+# Verify Document (Public)
+# curl -X GET http://localhost:5001/api/v1/verify/VER-ABC12345-1234567890ABCDEF
+
+# Get QR Code (Public)
+# curl -X GET http://localhost:5001/api/v1/verify/VER-ABC12345-1234567890ABCDEF/qrcode
+
+# Create Verification (Private)
+# curl -X POST http://localhost:5001/api/v1/verify/document/DOCUMENT_ID \
+#   -H "Authorization: Bearer YOUR_TOKEN"
+
+# Regenerate QR Code (Private)
+# curl -X POST http://localhost:5001/api/v1/verify/document/DOCUMENT_ID/regenerate-qr \
+#   -H "Authorization: Bearer YOUR_TOKEN"
+
+# Get Stats (Admin)
+# curl -X GET http://localhost:5001/api/v1/verify/admin/stats \
+#   -H "Authorization: Bearer YOUR_ADMIN_TOKEN"

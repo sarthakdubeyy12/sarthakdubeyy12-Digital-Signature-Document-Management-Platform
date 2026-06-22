@@ -5,6 +5,11 @@ const config = {
   env: process.env.NODE_ENV || 'development',
   port: parseInt(process.env.PORT, 10) || 5001,
   apiVersion: process.env.API_VERSION || 'v1',
+  
+  app: {
+    frontendUrl: process.env.FRONTEND_URL || 'http://localhost:3000',
+    backendUrl: process.env.BACKEND_URL || 'http://localhost:5001',
+  },
 
   // Database
   mongodb: {

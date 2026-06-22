@@ -20,7 +20,6 @@ const startServer = async () => {
 
     // Connect to Redis
     await redisClient.connect();
-    cacheService.initialize();
     logger.info('Redis connected successfully');
 
     // Start Express server
