@@ -1,0 +1,9 @@
+# SSL Certificate Directory
+# 
+# Place your SSL certificates here:
+# - fullchain.pem (certificate chain)
+# - privkey.pem (private key)
+#
+# For Let's Encrypt:
+# sudo cp /etc/letsencrypt/live/yourdomain.com/fullchain.pem ./
+# sudo cp /etc/letsencrypt/live/yourdomain.com/privkey.pem ./

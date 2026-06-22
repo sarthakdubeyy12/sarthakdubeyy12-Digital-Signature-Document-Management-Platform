@@ -139,28 +139,42 @@ npm run seed         # Seed database with initial data
 
 ## 🐳 Docker Setup
 
-### Using Docker Compose (Recommended)
+### Development Environment
 
 ```bash
-# Build and start all services
-cd docker
-docker-compose up -d
+# Default (API directly on port 5001)
+docker-compose -f docker/docker-compose.yml up -d --build
+
+# With Nginx reverse proxy (port 80)
+docker-compose -f docker/docker-compose.yml --profile with-nginx up -d --build
 
 # View logs
-docker-compose logs -f
+docker-compose -f docker/docker-compose.yml logs -f
 
 # Stop all services
-docker-compose down
+docker-compose -f docker/docker-compose.yml down
 
 # Stop and remove volumes
-docker-compose down -v
+docker-compose -f docker/docker-compose.yml down -v
 ```
 
+### Production Environment
+
+```bash
+# Start production services (includes Nginx with SSL support)
+docker-compose -f docker/docker-compose.prod.yml up -d --build
+
+# Health check
+./scripts/health-check.sh production
+```
+
+**See [PRODUCTION_DEPLOYMENT.md](PRODUCTION_DEPLOYMENT.md) for complete production setup guide.**
+
 Services included:
-- **API**: Node.js application (port 5000)
-- **MongoDB**: Database (port 27017)
-- **Redis**: Cache (port 6379)
-- **Nginx**: Reverse proxy (port 80)
+- **API**: Node.js application (port 5001)
+- **MongoDB**: Database with replica set (port 27017)
+- **Redis**: Cache with authentication (port 6379)
+- **Nginx**: Reverse proxy with SSL/TLS (ports 80, 443)
 
 ### Manual Docker Build
 
@@ -274,33 +288,81 @@ npm run test:watch
 
 ## 🚢 Deployment
 
+### Production Deployment
+
+**Complete production deployment guide**: [PRODUCTION_DEPLOYMENT.md](PRODUCTION_DEPLOYMENT.md)
+
+**Quick Start**:
+
+1. **Configure Environment**:
+   ```bash
+   cp .env.production .env
+   nano .env  # Update all production values
+   ```
+
+2. **Generate Secrets**:
+   ```bash
+   # JWT secrets
+   openssl rand -base64 64
+   
+   # Database passwords
+   openssl rand -base64 32
+   ```
+
+3. **Initialize MongoDB**:
+   ```bash
+   docker-compose -f docker/docker-compose.prod.yml up -d mongo
+   sleep 10
+   docker exec -it digital-signature-mongo-prod mongosh --eval "rs.initiate({_id: 'rs0', members: [{_id: 0, host: 'mongo:27017'}]})"
+   ```
+
+4. **Deploy All Services**:
+   ```bash
+   docker-compose -f docker/docker-compose.prod.yml up -d --build
+   ```
+
+5. **Verify Health**:
+   ```bash
+   ./scripts/health-check.sh production
+   ```
+
+### SSL/TLS Setup
+
+For HTTPS support, obtain SSL certificates and configure Nginx:
+
+```bash
+# Let's Encrypt (recommended)
+sudo certbot certonly --standalone -d yourdomain.com
+
+# Copy certificates
+sudo cp /etc/letsencrypt/live/yourdomain.com/fullchain.pem docker/nginx/ssl/
+sudo cp /etc/letsencrypt/live/yourdomain.com/privkey.pem docker/nginx/ssl/
+```
+
+See [PRODUCTION_DEPLOYMENT.md](PRODUCTION_DEPLOYMENT.md) for detailed SSL setup.
+
 ### Environment Variables
 
-Ensure all production environment variables are set:
+Production-critical variables:
 
-```bash
+```env
 NODE_ENV=production
-JWT_SECRET=<strong-secret>
-JWT_REFRESH_SECRET=<strong-secret>
-MONGODB_URI=<production-mongodb-uri>
-SMTP_USER=<email>
-SMTP_PASSWORD=<password>
+JWT_SECRET=<strong-random-64-chars>
+JWT_REFRESH_SECRET=<different-strong-random-64-chars>
+DATABASE_URL=mongodb://admin:<password>@mongo:27017/...
+REDIS_PASSWORD=<strong-password>
+SMTP_USER=<production-email>
+SMTP_PASSWORD=<app-password>
+FRONTEND_URL=https://yourdomain.com
 ```
 
-### Using Docker Compose
+### CI/CD Pipeline
 
-```bash
-docker-compose -f docker/docker-compose.yml up -d
-```
+GitHub Actions workflows included:
+- **CI Pipeline**: Lint, security scan, build test
+- **Docker Build**: Automated image builds and push
 
-### Using PM2
-
-```bash
-npm install -g pm2
-pm2 start src/server.js --name digital-signature-api
-pm2 save
-pm2 startup
-```
+Enable by pushing to GitHub and configuring secrets.
 
 ## 🔒 Security
 
