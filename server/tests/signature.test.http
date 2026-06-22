@@ -1,0 +1,149 @@
+### Signature Module API Tests
+### Base URL
+@baseUrl = http://localhost:5001/api/v1
+@accessToken = YOUR_ACCESS_TOKEN_HERE
+@signatureId = YOUR_SIGNATURE_ID_HERE
+@documentId = YOUR_DOCUMENT_ID_HERE
+
+### ==============================================
+### 1. Create Signature (Drawn - Base64)
+### ==============================================
+POST {{baseUrl}}/signatures
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "name": "My Drawn Signature",
+  "isReusable": true,
+  "signatureData": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg=="
+}
+
+### ==============================================
+### 2. Create Signature (Upload Image)
+### ==============================================
+POST {{baseUrl}}/signatures
+Authorization: Bearer {{accessToken}}
+Content-Type: multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW
+
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="name"
+
+My Uploaded Signature
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="isReusable"
+
+true
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="signature"; filename="signature.png"
+Content-Type: image/png
+
+< ./signature.png
+------WebKitFormBoundary7MA4YWxkTrZu0gW--
+
+### ==============================================
+### 3. List All Signatures
+### ==============================================
+GET {{baseUrl}}/signatures?page=1&limit=10
+Authorization: Bearer {{accessToken}}
+
+### ==============================================
+### 4. List Reusable Signatures Only
+### ==============================================
+GET {{baseUrl}}/signatures?isReusable=true
+Authorization: Bearer {{accessToken}}
+
+### ==============================================
+### 5. Get Reusable Signatures (Quick Access)
+### ==============================================
+GET {{baseUrl}}/signatures/reusable
+Authorization: Bearer {{accessToken}}
+
+### ==============================================
+### 6. Get Signature by ID
+### ==============================================
+GET {{baseUrl}}/signatures/{{signatureId}}
+Authorization: Bearer {{accessToken}}
+
+### ==============================================
+### 7. Update Signature
+### ==============================================
+PATCH {{baseUrl}}/signatures/{{signatureId}}
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "name": "Updated Signature Name",
+  "isReusable": true
+}
+
+### ==============================================
+### 8. Apply Signature to Document
+### ==============================================
+POST {{baseUrl}}/signatures/apply/{{documentId}}
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "signatureId": "{{signatureId}}",
+  "position": {
+    "page": 0,
+    "x": 100,
+    "y": 650,
+    "width": 150,
+    "height": 50
+  }
+}
+
+### ==============================================
+### 9. Delete Signature
+### ==============================================
+DELETE {{baseUrl}}/signatures/{{signatureId}}
+Authorization: Bearer {{accessToken}}
+
+### ==============================================
+### CURL Examples
+### ==============================================
+
+# Create Signature (Base64)
+# curl -X POST http://localhost:5001/api/v1/signatures \
+#   -H "Authorization: Bearer YOUR_TOKEN" \
+#   -H "Content-Type: application/json" \
+#   -d '{
+#     "name": "My Signature",
+#     "isReusable": true,
+#     "signatureData": "data:image/png;base64,..."
+#   }'
+
+# Create Signature (Upload)
+# curl -X POST http://localhost:5001/api/v1/signatures \
+#   -H "Authorization: Bearer YOUR_TOKEN" \
+#   -F "signature=@./signature.png" \
+#   -F "name=My Signature" \
+#   -F "isReusable=true"
+
+# List Signatures
+# curl -X GET "http://localhost:5001/api/v1/signatures?page=1&limit=10" \
+#   -H "Authorization: Bearer YOUR_TOKEN"
+
+# Get Reusable Signatures
+# curl -X GET http://localhost:5001/api/v1/signatures/reusable \
+#   -H "Authorization: Bearer YOUR_TOKEN"
+
+# Apply Signature
+# curl -X POST http://localhost:5001/api/v1/signatures/apply/DOCUMENT_ID \
+#   -H "Authorization: Bearer YOUR_TOKEN" \
+#   -H "Content-Type: application/json" \
+#   -d '{
+#     "signatureId": "SIGNATURE_ID",
+#     "position": {
+#       "page": 0,
+#       "x": 100,
+#       "y": 650,
+#       "width": 150,
+#       "height": 50
+#     }
+#   }'
+
+# Delete Signature
+# curl -X DELETE http://localhost:5001/api/v1/signatures/SIGNATURE_ID \
+#   -H "Authorization: Bearer YOUR_TOKEN"

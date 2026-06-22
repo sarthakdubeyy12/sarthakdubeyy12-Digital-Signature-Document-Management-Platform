@@ -16,8 +16,8 @@ const errorHandler = (err, req, res, next) => {
   let message = err.message || 'Internal Server Error';
   let errors = err.errors || null;
 
-  // Mongoose validation error
-  if (err.name === 'ValidationError') {
+  // Mongoose validation error (check for Mongoose-specific properties)
+  if (err.name === 'ValidationError' && err.errors && typeof err.errors === 'object' && !Array.isArray(err.errors)) {
     statusCode = 400;
     message = 'Validation Error';
     errors = Object.values(err.errors).map((e) => ({
