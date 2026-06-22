@@ -1,6 +1,7 @@
 const express = require('express');
 const signatureController = require('./signature.controller');
 const { authenticate } = require('../../middleware/auth.middleware');
+const { auditSignature } = require('../../middleware/audit.middleware');
 const { validate } = require('../../middleware/validation.middleware');
 const { uploadMiddleware } = require('../../middleware/upload.middleware');
 const {
@@ -35,6 +36,7 @@ router.post(
   '/',
   uploadMiddleware.single('signature'),
   validate(createSignatureSchema),
+  auditSignature.create,
   signatureController.createSignature
 );
 
@@ -46,6 +48,7 @@ router.post(
 router.post(
   '/apply/:documentId',
   validate(applySignatureSchema),
+  auditSignature.apply,
   signatureController.applySignature
 );
 
@@ -90,6 +93,7 @@ router.patch(
 router.delete(
   '/:id',
   validate(deleteSignatureSchema),
+  auditSignature.delete,
   signatureController.deleteSignature
 );
 

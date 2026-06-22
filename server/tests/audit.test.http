@@ -1,0 +1,124 @@
+### Audit Logging API Tests
+### Base URL
+@baseUrl = http://localhost:5001/api/v1
+@accessToken = YOUR_ACCESS_TOKEN_HERE
+@adminToken = YOUR_ADMIN_TOKEN_HERE
+@userId = YOUR_USER_ID_HERE
+@auditLogId = YOUR_AUDIT_LOG_ID_HERE
+
+### ==============================================
+### USER ROUTES (Authenticated)
+### ==============================================
+
+### 1. Get My Activity
+GET {{baseUrl}}/audit/my-activity?page=1&limit=20
+Authorization: Bearer {{accessToken}}
+
+### 2. Get My Activity with Date Range
+GET {{baseUrl}}/audit/my-activity?startDate=2026-01-01T00:00:00.000Z&endDate=2026-12-31T23:59:59.999Z
+Authorization: Bearer {{accessToken}}
+
+### 3. Get My Login History
+GET {{baseUrl}}/audit/my-login-history?limit=10
+Authorization: Bearer {{accessToken}}
+
+### 4. Get User Activity (Own)
+GET {{baseUrl}}/audit/user/{{userId}}?page=1&limit=20
+Authorization: Bearer {{accessToken}}
+
+### ==============================================
+### ADMIN ROUTES
+### ==============================================
+
+### 5. List All Audit Logs (Admin)
+GET {{baseUrl}}/audit/admin?page=1&limit=20&sortBy=createdAt&sortOrder=desc
+Authorization: Bearer {{adminToken}}
+
+### 6. List Audit Logs with Filters (Admin)
+GET {{baseUrl}}/audit/admin?action=USER_LOGIN&success=true&page=1&limit=20
+Authorization: Bearer {{adminToken}}
+
+### 7. List Failed Operations (Admin)
+GET {{baseUrl}}/audit/admin?success=false&page=1&limit=20
+Authorization: Bearer {{adminToken}}
+
+### 8. List Document Operations (Admin)
+GET {{baseUrl}}/audit/admin?resource=DOCUMENT&page=1&limit=20
+Authorization: Bearer {{adminToken}}
+
+### 9. List by Specific User (Admin)
+GET {{baseUrl}}/audit/admin?userId={{userId}}&page=1&limit=20
+Authorization: Bearer {{adminToken}}
+
+### 10. List by IP Address (Admin)
+GET {{baseUrl}}/audit/admin?ipAddress=192.168&page=1&limit=20
+Authorization: Bearer {{adminToken}}
+
+### 11. Get Audit Log by ID (Admin)
+GET {{baseUrl}}/audit/admin/{{auditLogId}}
+Authorization: Bearer {{adminToken}}
+
+### 12. Get Audit Statistics (Admin)
+GET {{baseUrl}}/audit/admin/stats
+Authorization: Bearer {{adminToken}}
+
+### 13. Get Audit Statistics with Date Range (Admin)
+GET {{baseUrl}}/audit/admin/stats?startDate=2026-06-01T00:00:00.000Z&endDate=2026-06-30T23:59:59.999Z
+Authorization: Bearer {{adminToken}}
+
+### 14. Get Activity Timeline (Admin)
+GET {{baseUrl}}/audit/admin/timeline?groupBy=day
+Authorization: Bearer {{adminToken}}
+
+### 15. Get Activity Timeline by Week (Admin)
+GET {{baseUrl}}/audit/admin/timeline?groupBy=week&startDate=2026-06-01T00:00:00.000Z
+Authorization: Bearer {{adminToken}}
+
+### 16. Get Recent Activity (Admin Dashboard)
+GET {{baseUrl}}/audit/admin/recent?limit=10
+Authorization: Bearer {{adminToken}}
+
+### 17. Get Suspicious Activities (Admin)
+GET {{baseUrl}}/audit/admin/suspicious?limit=20
+Authorization: Bearer {{adminToken}}
+
+### 18. Export Audit Logs as JSON (Admin)
+GET {{baseUrl}}/audit/admin/export?format=json&startDate=2026-06-01T00:00:00.000Z
+Authorization: Bearer {{adminToken}}
+
+### 19. Export Audit Logs as CSV (Admin)
+GET {{baseUrl}}/audit/admin/export?format=csv&startDate=2026-06-01T00:00:00.000Z
+Authorization: Bearer {{adminToken}}
+
+### 20. Export Filtered Logs (Admin)
+GET {{baseUrl}}/audit/admin/export?format=json&action=DOCUMENT_UPLOAD&resource=DOCUMENT
+Authorization: Bearer {{adminToken}}
+
+### ==============================================
+### CURL Examples
+### ==============================================
+
+# Get My Activity
+# curl -X GET "http://localhost:5001/api/v1/audit/my-activity?page=1&limit=20" \
+#   -H "Authorization: Bearer YOUR_TOKEN"
+
+# Get My Login History
+# curl -X GET "http://localhost:5001/api/v1/audit/my-login-history?limit=10" \
+#   -H "Authorization: Bearer YOUR_TOKEN"
+
+# List All Audit Logs (Admin)
+# curl -X GET "http://localhost:5001/api/v1/audit/admin?page=1&limit=20" \
+#   -H "Authorization: Bearer YOUR_ADMIN_TOKEN"
+
+# Get Audit Statistics (Admin)
+# curl -X GET "http://localhost:5001/api/v1/audit/admin/stats" \
+#   -H "Authorization: Bearer YOUR_ADMIN_TOKEN"
+
+# Get Suspicious Activities (Admin)
+# curl -X GET "http://localhost:5001/api/v1/audit/admin/suspicious?limit=20" \
+#   -H "Authorization: Bearer YOUR_ADMIN_TOKEN"
+
+# Export as CSV (Admin)
+# curl -X GET "http://localhost:5001/api/v1/audit/admin/export?format=csv" \
+#   -H "Authorization: Bearer YOUR_ADMIN_TOKEN" \
+#   -o audit-logs.csv

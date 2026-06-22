@@ -30,13 +30,10 @@ class LoggerService {
   }
 
   // Audit logging
-  audit(action, userId, resource, resourceId, metadata = {}) {
+  audit(action, metadata = {}) {
     auditLogger.info('Audit Log', {
       action,
-      userId,
-      resource,
-      resourceId,
-      metadata,
+      ...metadata,
       timestamp: new Date().toISOString(),
     });
   }

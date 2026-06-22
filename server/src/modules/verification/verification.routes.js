@@ -1,6 +1,7 @@
 const express = require('express');
 const verificationController = require('./verification.controller');
 const { authenticate, authorize } = require('../../middleware/auth.middleware');
+const { auditVerification } = require('../../middleware/audit.middleware');
 const { validate } = require('../../middleware/validation.middleware');
 const {
   verifyDocumentSchema,
@@ -22,6 +23,7 @@ const router = express.Router();
 router.get(
   '/:code',
   validate(verifyDocumentSchema),
+  auditVerification.verify,
   verificationController.verifyDocument
 );
 

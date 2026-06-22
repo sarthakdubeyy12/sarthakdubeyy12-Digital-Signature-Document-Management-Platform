@@ -1,6 +1,7 @@
 const express = require('express');
 const documentController = require('./document.controller');
 const { authenticate } = require('../../middleware/auth.middleware');
+const { auditDocument } = require('../../middleware/audit.middleware');
 const { validate } = require('../../middleware/validation.middleware');
 const { uploadMiddleware } = require('../../middleware/upload.middleware');
 const {
@@ -35,6 +36,7 @@ router.post(
   '/',
   uploadMiddleware.single('document'),
   validate(uploadDocumentSchema),
+  auditDocument.upload,
   documentController.uploadDocument
 );
 
@@ -57,6 +59,7 @@ router.get(
 router.get(
   '/:id',
   validate(getDocumentByIdSchema),
+  auditDocument.view,
   documentController.getDocumentById
 );
 
@@ -68,6 +71,7 @@ router.get(
 router.patch(
   '/:id',
   validate(updateDocumentSchema),
+  auditDocument.update,
   documentController.updateDocument
 );
 
@@ -79,6 +83,7 @@ router.patch(
 router.delete(
   '/:id',
   validate(deleteDocumentSchema),
+  auditDocument.delete,
   documentController.deleteDocument
 );
 
@@ -90,6 +95,7 @@ router.delete(
 router.get(
   '/:id/download',
   validate(downloadDocumentSchema),
+  auditDocument.download,
   documentController.downloadDocument
 );
 
